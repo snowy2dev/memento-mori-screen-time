@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Find out how much of your life you’ve spent on screens. A simple, quiet tool that reveals your real screen time.">
+    <title>Screen Time Calculator - How Much of Your Life is Spent on Screens?</title>
+    <style>
+        .title {
+            text-align: center;
+            font-family: "Roboto",system-ui;
+            color: #0F172A;
+        }
+        .center {
+            position: static;
+            transform: none;
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+        }
+        #subtitle {
+            transform: none;
+            margin-top: -4px;
+            margin-bottom: 24px;
+            color: #475569;
+            font-size: 14px;
+        }
+        #subtitle2 {
+            margin-top: -28px;
+            margin-bottom: 22px;
+        }
+        h1 {
+            font-size: 48px;
+            margin: 0;
+        }
+        h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+        h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #334155;
+        }
+        h4 {
+            margin: 0;
+            font-size: 15px;
+            color: #475569;
+        }
+        #mainTitle {
+            color: #F1F5F9;
+            margin-top: 28px;
+            margin-bottom: 26px;
+        }
+        .mainTitlePage {
+            color: #e8ebed;
+            text-align: center;
+        }
+        body {
+            background:
+                    radial-gradient(circle at center,
+                    rgba(0,0,0,0) 60%,
+                    rgba(0,0,0,0.35) 100%),
+                    radial-gradient(circle at 50% 20%,
+                    #2c314f 0%,
+                    #161b36 60%,
+                    #0c1022 100%);
+            margin: 0;
+            padding: 0 12px;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+
+            background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+            opacity: 0.04;
+
+            pointer-events: none;
+        }
+        #phoneDevice {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 380px;
+            height: 620px;
+            margin: auto;
+            border: 10px #0e0d0d solid;
+            border-top-width: 16px;
+            border-bottom-width: 34px;
+            border-radius: 20px;
+            background: #0e0d0d;
+            box-shadow:
+                    0 25px 60px rgba(0,0,0,0.55),
+                    0 8px 20px rgba(0,0,0,0.35),
+                    0 0 40px rgba(49, 46, 129, 0.08);
+        }
+        #phoneDevice::before { /* front camera notch */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 42%;
+            height: 15px;
+            background: #000;
+            border-radius: 0 0 20px 20px;
+            z-index: 2;
+        }
+        #homeBar { /* phone camera notch */
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+
+            width: 40%;
+            height: 5px;
+
+            background: #94A3B8;
+            border-radius: 5px;
+
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+        #homeBar:hover {
+            opacity: 1;
+        }
+        #homeBar:active {
+            transform: translateX(-50%) scaleX(0.95);
+        }
+        #phoneDevice #screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #F8FAFC, #EEF2F7);
+            overflow: hidden;
+            padding: 40px 20px;
+            box-sizing: border-box;
+            transition: opacity 0.3s ease;
+        }
+        #phoneDevice #results {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: linear-gradient(180deg, #F8FAFC, #EEF2F7);
+            display: none;
+            padding: 24px 20px;
+            box-sizing: border-box;
+            transition: opacity 0.3s ease;
+        }
+
+        #resultsScroller {
+            width: 100%;
+            height: 200%;
+            transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* ensure page 1 shows first */
+        #resultsPage1,
+        #resultsPage2 {
+            width: 100%;
+            height: 50%;
+            box-sizing: border-box;
+        }
+
+        .card {
+            margin-bottom: 18px;
+        }
+
+        #timeCalculator {
+            background: rgba(255,255,255,0.9);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #E2E8F0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #0F172A;
+            font-size: 14px;
+        }
+
+        input[type="number"],
+        input[type="date"] {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #CBD5E1;
+            font-size: 15px;
+            margin-bottom: 14px;
+        }
+
+        .button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 14px;
+            border: none;
+            border-radius: 12px;
+            background: #312E81;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        #back {
+            margin-top: 70px;
+        }
+        .button:active {
+            transform: translateY(2px);
+            box-shadow: 0 4px 10px;
+        }
+
+
+        /* RESULT PAGE 1 */
+        #resultsPage1 h1 {
+            text-align: center;
+            font-size: 60px;
+            color: #312E81;
+            line-height: 0.95;
+            letter-spacing: -1px;
+            white-space: nowrap;
+            overflow-wrap: normal;
+        }
+        #p1subtitle {
+            transform: translateY(-20px);
+        }
+        #resultsPage1 p {
+            text-align: center;
+            color: #334155;
+        }
+        #resultsPage1 h3,
+        #resultsPage1 h4 {
+            color: #334155;
+            text-align: center;
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        /* RESULT PAGE 2 */
+        #resultsPage2 {
+            position: relative;
+            text-align: center;
+            padding-top: 24px;
+        }
+        #resultsPage2 .card {
+            margin-bottom: 10px;
+        }
+        #resultsPage2 h1 {
+            font-size: 52px;
+            color: #312E81;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+        #resultsPage2 h4 {
+            color: #475569;
+            font-size: 14px;
+        }
+        #resultsPage2 h2 {
+            font-size: 16px;
+            color: #475569;
+        }
+        #assumptionNote {
+            position: absolute;
+            bottom: 34px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 11px;
+            color: #94A3B8;
+            letter-spacing: 0.2px;
+        }
+        #homeHint {
+            position: absolute;
+            bottom: 18px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 11px;
+            color: #94A3B8;
+            letter-spacing: 0.2px;
+            display: block;
+        }
+
+        /* SAVED TIME RESULTS */
+        #savedTimeTool {
+            margin-top: 18px;
+            padding: 12px 10px 10px 10px;
+            background: rgba(255,255,255,0.45);
+            border: 1px solid rgba(226,232,240,0.7);
+            border-radius: 14px;
+        }
+        #savedTimeLabel {
+            color: #334155;
+            margin-bottom: 12px;
+        }
+        #hoursSavedSlider {
+            width: 100%;
+            margin: 6px 0 10px 0;
+            accent-color: #312E81;
+        }
+        #sliderValue {
+            text-align: center;
+            color: #475569;
+            font-size: 14px;
+            margin: 0 0 12px 0;
+        }
+        #savedHoursResult {
+            text-align: center;
+            color: #334155;
+            font-size: 16px;
+            margin: 0 0 6px 0;
+        }
+        #savedYearsResult {
+            text-align: center;
+            color: #475569;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        /* Share Options */
+        .shareActions {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .shareButton {
+            flex: 1;
+            appearance: none;
+            -webkit-appearance: none;
+            padding: 11px 12px;
+            border: 1px solid rgba(49,46,129,0.16);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.55);
+            color: #312E81;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .shareButton:active {
+            transform: translateY(1px);
+            background: rgba(255,255,255,0.72);
+        }
+        .shareStatus {
+            min-height: 16px;
+            margin-top: 8px;
+            font-size: 12px;
+            text-align: center;
+            color: #475569;
+        }
+
+        /* Input Validation Error Styling */
+        .errorText {
+            color: #b91c1c;
+            font-size: 13px;
+            margin-top: 0;
+            padding-top: 0;
+            margin-bottom: 4px;
+            text-align: center;
+            min-height: 18px;
+            transform: translateY(-12px);
+        }
+        input:invalid {
+            border-color: #990000;
+            background-color: #ffdddd;
+        }
+        input:focus:invalid {
+            outline: none;
+        }
+        @media (max-width: 420px) {
+            h1 {
+                font-size: 38px;
+            }
+
+            #phoneDevice {
+                box-sizing: border-box;
+                height: 570px;
+            }
+
+            #phoneDevice #screen {
+                padding: 30px 16px;
+            }
+
+            #resultsPage1 {
+                padding-top: 4px;
+            }
+
+            #resultsPage1 .card {
+                margin-bottom: 10px;
+            }
+
+            #resultsPage1 h1 {
+                font-size: 48px;
+                margin-bottom: 4px;
+            }
+
+            #p1subtitle {
+                transform: translateY(-10px);
+                margin-bottom: 0;
+            }
+
+            #resultsPage1 h3,
+            #resultsPage1 h4 {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            #resultsPage1 .button {
+                margin-top: 8px;
+                padding: 12px;
+            }
+
+            .shareActions {
+                gap: 8px;
+                margin-top: 10px;
+            }
+
+            .shareButton {
+                padding: 10px 10px;
+                font-size: 13px;
+            }
+
+            #back {
+                margin-top: auto;
+            }
+
+            .shareStatus {
+                min-height: 14px;
+                margin-top: 6px;
+                font-size: 11px;
+            }
+
+            #resultsPage2 {
+                padding-top: 24px;
+            }
+        }
+        @media (max-height: 800px) {
+            body {
+                padding-top: 12px;
+                padding-bottom: 18px;
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+            #mainTitle {
+                margin-top: 12px;
+                margin-bottom: 14px;
+            }
+            #subtitle2 {
+                margin-top: -16px;
+                margin-bottom: 14px;
+            }
+        }
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+<h1 class="title" id="mainTitle">Memento Mori</h1>
+<h3 class="title mainTitlePage" id="subtitle2">A quiet reflection on time, routine, and what repetition becomes.</h3>
+
+<div id="phoneDevice">
+
+    <div id="results">
+        <div id="resultsScroller">
+            <div id="resultsPage1">
+                <h1 id="mainResult" class="card"></h1>
+                <p class="card" id="p1subtitle">of your life on screens</p>
+                <h3 id="totalHours" class="card"></h3>
+                <h3 id="totalYears" class="card"></h3>
+                <h4 id="lifetimeProjection" class="card"></h4>
+                <p class="card">This time is gone.</p>
+
+                <div class="shareActions">
+                    <button id="copyResult" class="shareButton">Copy Result</button>
+                    <button id="shareResult" class="shareButton">Share</button>
+                </div>
+                <p id="shareStatus" class="shareStatus"></p>
+                <!-- I was really hesitant on implementing this but the whole reason I
+                 even designed this web app is to bring awareness to the life we're all
+                 spending on screens, doomscrolling, binging, etc. so the more this spreads,
+                 the more I've achieved my goal of more awareness -->
+
+                <button id="next" class="button">Next</button>
+            </div>
+
+            <div id="resultsPage2">
+                <h4 class="card">You've spent about</h4>
+                <h1 id="timePercentage" class="card"></h1>
+                <h2 id="page2ScreenStartAge" class="card"></h2>
+
+                <div id="savedTimeTool">
+                    <h4 id="savedTimeLabel">Reduce by</h4>
+                    <input type="range" id="hoursSavedSlider" min="0" max="12" step="0.5" value="1">
+                    <p id="sliderValue">1 hour per day</p>
+                    <h3 id="savedHoursResult"></h3>
+                    <h4 id="savedYearsResult"></h4>
+                </div>
+
+                <button id="back" class="button">Back</button>
+
+                <p id="assumptionNote">Assuming 8 hours of sleep per day.</p>
+                <p id="homeHint">Tap the home bar below to return</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen">
+        <h2 class="title">Screen Time Calculator</h2>
+        <p class="title" id="subtitle">See where your time really goes</p>
+
+        <form id="timeCalculator">
+            <label for="hoursPerDay">Average hours of screentime per day:</label>
+            <input type="number" min="0" max="24" step="0.5" id="hoursPerDay">
+            <p id="avgHrsError" class="errorText"></p>
+
+            <label for="birthdate">Birthdate:</label>
+            <input type="date" id="birthdate">
+            <p id="birthdateError" class="errorText"></p>
+
+            <label for="ageStarted">Approximate age you started screentime:</label>
+            <input type="number" min="0" step="1" id="ageStarted">
+            <p id="ageSelectError" class="errorText"></p>
+
+            <input type="submit" class="center button" value="Calculate">
+        </form>
+    </div>
+
+    <div id="homeBar"></div>
+</div>
+
+<script>
+    const form = document.getElementById("timeCalculator");
+    const nextButton = document.getElementById("next");
+    const backButton = document.getElementById("back");
+    const hoursInput = document.getElementById("hoursPerDay");
+    const ageInput = document.getElementById("birthdate");
+    const ageStartInput = document.getElementById("ageStarted");
+    const resultsScreen = document.getElementById("results");
+    const resultsPage1 = document.getElementById("resultsPage1");
+    const resultsPage2 = document.getElementById("resultsPage2");
+    const screenDiv = document.getElementById("screen");
+    const mainResult = document.getElementById("mainResult");
+    const hoursResult = document.getElementById("totalHours");
+    const yearsResult = document.getElementById("totalYears");
+    const projection = document.getElementById("lifetimeProjection");
+    const wakingHoursPercentage = document.getElementById("timePercentage");
+    const startingAge = document.getElementById("page2ScreenStartAge");
+    const resultsScroller = document.getElementById("resultsScroller");
+    // error messages
+    const hoursError = document.getElementById("avgHrsError");
+    const birthdateError = document.getElementById("birthdateError");
+    const ageSelectError = document.getElementById("ageSelectError");
+    // saved time results elements
+    const hoursSavedSlider = document.getElementById("hoursSavedSlider");
+    const sliderValue = document.getElementById("sliderValue");
+    const savedHoursResult = document.getElementById("savedHoursResult");
+    const savedYearsResult = document.getElementById("savedYearsResult");
+    const homeBar = document.getElementById("homeBar");
+    const homeHint = document.getElementById("homeHint");
+    const copyResultPage = document.getElementById("copyResult");
+    const shareResultPage = document.getElementById("shareResult");
+    const shareStatusMessage = document.getElementById("shareStatus");
+
+    let screenPercentage;
+    let ageStarted;
+    let dailyHours;
+    let remainingYears;
+    let savedDailyHours;
+    let savedRemainingYears;
+    let shareText = "";
+
+    // UI cleanup incase browser doesn't support this function
+    if (!navigator.share) {
+        shareResultPage.style.display = "none";
+    }
+    function animateValue(element, start, end, duration, suffix) {
+        const startTime = performance.now();
+
+        function update(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            const easedProgress = 1 - Math.pow(1 - progress, 3);
+            const currentValue = start + (end - start) * easedProgress;
+            element.textContent = Math.floor(currentValue).toLocaleString() + suffix;
+
+            if (progress < 1) {
+                requestAnimationFrame(update);
+            }
+            else {
+                element.textContent = Number(end.toFixed(1)).toLocaleString() + suffix;
+
+                savedDailyHours = dailyHours;
+                savedRemainingYears = remainingYears;
+
+                hoursSavedSlider.max = dailyHours;
+                hoursSavedSlider.value = Math.min(1, dailyHours);
+                updateSavedTime();
+            }
+        }
+
+        requestAnimationFrame(update);
+    }
+    function updateSavedTime() {
+        const reduction = Math.min(Number(hoursSavedSlider.value), savedDailyHours);
+
+        const savedHours = reduction * savedRemainingYears * 365.25;
+        const savedYears = savedHours / 24 / 365.25;
+
+        if (reduction === 1) {
+            sliderValue.textContent = "1 hour per day";
+        }
+        else {
+            sliderValue.textContent = reduction + " hours per day";
+        }
+
+        savedHoursResult.textContent = Number(savedHours.toFixed(1)).toLocaleString() + " lifetime hours saved";
+        savedYearsResult.textContent = Number(savedYears.toFixed(1)).toLocaleString() + " lifetime years returned";
+    }
+
+    async function copyResult(text, statusElement) {
+        try {
+            await navigator.clipboard.writeText(text);
+            statusElement.textContent = "Copied.";
+        } catch (error) {
+            statusElement.textContent = "Copy failed.";
+        }
+    }
+    async function shareResult(text, statusElement) {
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    text: text,
+                    url: "https://screentime-mori.netlify.app/"
+                });
+                statusElement.textContent = "";
+            } catch (error) {
+                statusElement.textContent = "";
+            }
+        } else {
+            statusElement.textContent = "Sharing isn't supported here.";
+        }
+    }
+
+    hoursInput.addEventListener("input", () => hoursError.textContent = "");
+    ageInput.addEventListener("input", () => birthdateError.textContent = "");
+    ageStartInput.addEventListener("input", () => ageSelectError.textContent = "");
+
+    form.addEventListener("submit", function(event) {
+        event.preventDefault();
+        hoursError.textContent = "";
+        birthdateError.textContent = "";
+        ageSelectError.textContent = "";
+
+        // user input validation
+        if (hoursInput.value === "" || !hoursInput.value) {
+            hoursError.textContent = ("Hours per day cannot be blank.")
+            return;
+        }
+        if (!ageInput.value) {
+            birthdateError.textContent = ("Please enter your birthdate.");
+            return;
+        }
+        if (ageStartInput.value === "" || !ageStartInput.value) {
+            ageSelectError.textContent = ("Please enter age you started screentime.");
+            return;
+        }
+
+        // convert user input into workable variables
+        const birthdateValue = ageInput.value;
+        // ensure user inputs are numbers
+        // this was a pain to figure out lol
+        // to be fair, this is my first JavaScript project
+        dailyHours = Number(hoursInput.value);
+        ageStarted = Number(ageStartInput.value);
+
+        // final input validation
+        if (isNaN(dailyHours) || dailyHours < 0) {
+            hoursError.textContent = ("Please enter a valid number.");
+            return;
+        }
+        if (isNaN(ageStarted) || ageStarted < 0) {
+            ageSelectError.textContent = ("Please enter a valid number.");
+            return;
+        }
+
+        // extreme edge case catch
+        if (dailyHours > 23.5) {
+            hoursError.textContent = ("You don't need anymore screen time💀, go to sleep.");
+            return;
+        }
+        // age calculation logic
+        const birthDate = new Date(birthdateValue);
+        const today = new Date();
+        // error prevention
+        if (birthDate > today) {
+            birthdateError.textContent = ("Birthdate cannot be in the future!");
+            return;
+        }
+        let age = today.getFullYear() - birthDate.getFullYear();
+        //adjust age if birthday hasn't passed yet for current year
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        const dayDiff = today.getDate() - birthDate.getDate();
+        if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+            age--;
+        }
+        // error prevention
+        if (ageStarted > age) {
+            ageSelectError.textContent = ("Age started must be between 0 and your current age.");
+            return;
+        }
+
+        // get exact time elapsed between now and screen start date
+        const screenStartDate = new Date(birthDate);
+        screenStartDate.setFullYear(screenStartDate.getFullYear() + ageStarted);
+        // extreme edge case catch
+        if (screenStartDate > today) {
+            ageSelectError.textContent = ("Screen-time start date cannot be in the future. But while you're there, give me Monday's" +
+                " winning lottery numbers");
+            return;
+        }
+
+        const msSinceStart = today - screenStartDate;
+        const daysSinceStart = msSinceStart / (1000 * 60 * 60 * 24);
+        // calculate total screen time
+        let totalHours = dailyHours * daysSinceStart;
+        let totalDays = totalHours / 24;
+        let totalYears = totalHours / 24 / 365.25;
+
+        // user's lifetime screen time projection
+        const avgLifeSpan = 82;
+        remainingYears = avgLifeSpan - ageStarted;
+        const lifeTimeProjectionHours = dailyHours * remainingYears * 365.25;
+        const lifeTimeProjectionYears = lifeTimeProjectionHours / 24 / 365.25;
+
+        // calculate waking hours screentime percentage
+        const wakingHoursSinceStart = 16 * daysSinceStart;
+        screenPercentage = (totalHours / wakingHoursSinceStart) * 100;
+
+        // assign user's saved potential time
+        savedDailyHours = dailyHours;
+        savedRemainingYears = remainingYears;
+        hoursSavedSlider.max = dailyHours;
+        hoursSavedSlider.value = Math.min(1, dailyHours);
+        updateSavedTime();
+
+        if (dailyHours && age && ageStarted) {
+            animateValue(mainResult, 0, totalDays, 960, " days");
+            hoursResult.textContent = (Number(totalHours.toFixed(1)).toLocaleString() + " total hours");
+            yearsResult.textContent = (Number(totalYears.toFixed(1)).toLocaleString() + " total years");
+            projection.textContent = ("If you continue this daily habit, you will spend " + Number(lifeTimeProjectionHours.toFixed(1)).toLocaleString() + " hours " +
+                "or " + Number(lifeTimeProjectionYears.toFixed(1)).toLocaleString() + " years staring at a screen in your lifetime.");
+            shareText = "I've spent " + Number(totalDays.toFixed(1)).toLocaleString() + " total days on screens. Check your time: https://screentime-mori.netlify.app/";
+
+            screenDiv.style.opacity = '20';
+
+            setTimeout(() => {
+                screenDiv.style.display = 'none';
+                resultsScreen.style.display = 'block';
+                resultsScreen.style.opacity = '1';
+            }, 69);
+            resultsScroller.style.transform = "translateY(0)";
+        }
+    })
+
+    // share results
+    copyResultPage.addEventListener("click", function() {
+        copyResult(shareText, shareStatusMessage);
+    });
+    shareResultPage.addEventListener("click", function() {
+        shareResult(shareText, shareStatusMessage);
+    });
+
+    hoursSavedSlider.addEventListener("input", updateSavedTime);
+    // goto page 2
+    nextButton.addEventListener("click", function(event) {
+        event.preventDefault();
+
+        wakingHoursPercentage.textContent = (Number(screenPercentage.toFixed(0)) + "% of your waking life");
+        startingAge.textContent = ("on screens since age " + Number(ageStarted));
+
+        resultsScroller.style.transform = "translateY(-50%)";
+    })
+
+    // back to page 1
+    backButton.addEventListener("click", function(event) {
+        event.preventDefault();
+
+        resultsScroller.style.transform = "translateY(0)";
+    })
+
+    homeBar.addEventListener("click", function() {
+        homeHint.style.display = "none";
+
+        // reset scroll position
+        resultsScroller.style.transform = "translateY(0)";
+
+        // animate results downward + fade
+        resultsScreen.style.transform = "translateY(40px)";
+        resultsScreen.style.opacity = "0";
+
+        setTimeout(() => {
+            resultsScreen.style.display = "none";
+            resultsScreen.style.transform = "translateY(0)";
+
+            screenDiv.style.display = "block";
+            screenDiv.style.opacity = "0";
+
+            // fade input back in
+            setTimeout(() => {
+                screenDiv.style.opacity = "1";
+            }, 10);
+
+        }, 300);
+
+        // reset form + errors
+        form.reset();
+        hoursError.textContent = "";
+        birthdateError.textContent = "";
+        ageSelectError.textContent = "";
+        shareStatusMessage.textContent = "";
+        shareText = "";
+    });
+</script>
+
+</body>
+</html>
