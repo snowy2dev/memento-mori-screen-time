@@ -8,7 +8,7 @@ A minimal web app that calculates how much of your life has been spent on screen
 Instead of daily limits or productivity advice, this tool presents a single number — your total screen time — to encourage reflection.
 
 ## Live Demo
-https://screentime-mori.netlify.app/
+https://screentime-mori.org
 
 ## Concept
 
