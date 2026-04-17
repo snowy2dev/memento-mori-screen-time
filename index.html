@@ -185,7 +185,8 @@
         }
 
         input[type="number"],
-        input[type="date"] {
+        input[type="date"],
+        input[type="text"] {
             width: 100%;
             box-sizing: border-box;
             padding: 12px;
@@ -370,7 +371,20 @@
         input:focus:invalid {
             outline: none;
         }
+
+        #desktopBirthdate {
+            display: block;
+        }
+        #mobileBirthdate {
+            display: none;
+        }
         @media (max-width: 420px) {
+            #mobileBirthdate {
+                display: block;
+            }
+            #desktopBirthdate {
+                display: none;
+            }
             h1 {
                 font-size: 38px;
             }
@@ -520,9 +534,17 @@
             <input type="number" min="0" max="24" step="0.5" id="hoursPerDay">
             <p id="avgHrsError" class="errorText"></p>
 
-            <label for="birthdate">Birthdate:</label>
-            <input type="date" id="birthdate">
-            <p id="birthdateError" class="errorText"></p>
+            <div id="desktopBirthdate">
+                <label for="birthdate">Birthdate:</label>
+                <input type="date" id="birthdate">
+                <p id="birthdateError" class="errorText"></p>
+            </div>
+
+            <div id="mobileBirthdate">
+                <label for="dateField">Birthdate:</label>
+                <input type="text" inputmode="numeric" pattern="\d{2}/\d{2}/\d{4}" id="dateField" placeholder="MM/DD/YYYY" maxlength="10">
+                <p id="dateFieldError" class="errorText"></p>
+            </div>
 
             <label for="ageStarted">Approximate age you started screentime:</label>
             <input type="number" min="0" step="1" id="ageStarted">
@@ -567,6 +589,9 @@
     const copyResultPage = document.getElementById("copyResult");
     const shareResultPage = document.getElementById("shareResult");
     const shareStatusMessage = document.getElementById("shareStatus");
+    // mobile version of birthdate input
+    const dateInput = document.getElementById("dateField");
+    const dateError = document.getElementById("dateFieldError");
 
     let screenPercentage;
     let ageStarted;
@@ -638,7 +663,7 @@
             try {
                 await navigator.share({
                     text: text,
-                    url: "https://screentime-mori.netlify.app/"
+                    url: "https://screentime-mori.org/"
                 });
                 statusElement.textContent = "";
             } catch (error) {
@@ -649,23 +674,134 @@
         }
     }
 
+    dateInput.addEventListener("input", (e) => {
+        let value = e.target.value.replace(/\D/g, ""); // remove non-digits
+
+        if (value.length > 2 && value.length <= 4) {
+            value = value.slice(0, 2) + "/" + value.slice(2);
+        } else if (value.length > 4) {
+            value = value.slice(0, 2) + "/" + value.slice(2, 4) + "/" + value.slice(4, 8);
+        }
+
+        e.target.value = value;
+    });
+
     hoursInput.addEventListener("input", () => hoursError.textContent = "");
-    ageInput.addEventListener("input", () => birthdateError.textContent = "");
+    ageInput.addEventListener("input", clearBirthdateErrors);
+    dateInput.addEventListener("input", clearBirthdateErrors);
     ageStartInput.addEventListener("input", () => ageSelectError.textContent = "");
+
+    function getBirthdateValue() {
+        const nativeDateValue = ageInput.value.trim();   // yyyy-mm-dd
+        const textDateValue = dateInput.value.trim();    // mm/dd/yyyy
+
+        // Prefer native date input if user filled it
+        if (nativeDateValue) {
+            const nativeDate = new Date(nativeDateValue + "T00:00:00");
+
+            if (isNaN(nativeDate.getTime())) {
+                return { value: null, error: "Please enter a valid birthdate." };
+            }
+
+            const today = new Date();
+            if (nativeDate > today) {
+                return { value: null, error: "Birthdate cannot be in the future!" };
+            }
+
+            return { value: nativeDateValue, error: "" };
+        }
+
+        // If text input is empty too
+        if (!textDateValue) {
+            return { value: "", error: "Please enter your birthdate." };
+        }
+
+        // Must match MM/DD/YYYY exactly
+        const match = textDateValue.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+        if (!match) {
+            return { value: null, error: "Use MM/DD/YYYY." };
+        }
+
+        const month = Number(match[1]);
+        const day = Number(match[2]);
+        const year = Number(match[3]);
+
+        // Basic year check
+        if (year < 1000) {
+            return { value: null, error: "Please enter a valid 4-digit year." };
+        }
+
+        // Month check
+        if (month < 1 || month > 12) {
+            return { value: null, error: "Month must be between 01 and 12." };
+        }
+
+        // Figure out max valid day for that month/year
+        const daysInMonth = new Date(year, month, 0).getDate();
+
+        if (day < 1 || day > daysInMonth) {
+            return { value: null, error: "That day is not valid for that month." };
+        }
+
+        // Convert MM/DD/YYYY -> YYYY-MM-DD
+        const normalizedValue =
+            `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+        // Build date safely and verify it didn't roll over
+        const parsedDate = new Date(normalizedValue + "T00:00:00");
+
+        if (
+            isNaN(parsedDate.getTime()) ||
+            parsedDate.getFullYear() !== year ||
+            parsedDate.getMonth() + 1 !== month ||
+            parsedDate.getDate() !== day
+        ) {
+            return { value: null, error: "Please enter a valid birthdate." };
+        }
+
+        const today = new Date();
+        if (parsedDate > today) {
+            return { value: null, error: "Birthdate cannot be in the future!" };
+        }
+
+        return { value: normalizedValue, error: "" };
+    }
+
+    function clearBirthdateErrors() {
+        birthdateError.textContent = "";
+        dateError.textContent = "";
+    }
+
+    function showBirthdateError(message) {
+        const nativeHasValue = ageInput.value.trim() !== "";
+        const textHasValue = dateInput.value.trim() !== "";
+
+        clearBirthdateErrors();
+
+        if (textHasValue && !nativeHasValue) {
+            dateError.textContent = message;
+        } else {
+            birthdateError.textContent = message;
+        }
+    }
 
     form.addEventListener("submit", function(event) {
         event.preventDefault();
         hoursError.textContent = "";
-        birthdateError.textContent = "";
+        clearBirthdateErrors();
         ageSelectError.textContent = "";
+
+        const birthdateResult = getBirthdateValue();
+        const birthdateValue = birthdateResult.value;
+
+        if (birthdateResult.error) {
+            showBirthdateError(birthdateResult.error);
+            return;
+        }
 
         // user input validation
         if (hoursInput.value === "" || !hoursInput.value) {
             hoursError.textContent = ("Hours per day cannot be blank.")
-            return;
-        }
-        if (!ageInput.value) {
-            birthdateError.textContent = ("Please enter your birthdate.");
             return;
         }
         if (ageStartInput.value === "" || !ageStartInput.value) {
@@ -673,11 +809,8 @@
             return;
         }
 
-        // convert user input into workable variables
-        const birthdateValue = ageInput.value;
         // ensure user inputs are numbers
         // this was a pain to figure out lol
-        // to be fair, this is my first JavaScript project
         dailyHours = Number(hoursInput.value);
         ageStarted = Number(ageStartInput.value);
 
@@ -701,7 +834,7 @@
         const today = new Date();
         // error prevention
         if (birthDate > today) {
-            birthdateError.textContent = ("Birthdate cannot be in the future!");
+            showBirthdateError("Birthdate cannot be in the future!");
             return;
         }
         let age = today.getFullYear() - birthDate.getFullYear();
@@ -757,7 +890,7 @@
             yearsResult.textContent = (Number(totalYears.toFixed(1)).toLocaleString() + " total years");
             projection.textContent = ("If you continue this daily habit, you will spend " + Number(lifeTimeProjectionHours.toFixed(1)).toLocaleString() + " hours " +
                 "or " + Number(lifeTimeProjectionYears.toFixed(1)).toLocaleString() + " years staring at a screen in your lifetime.");
-            shareText = "I've spent " + Number(totalDays.toFixed(1)).toLocaleString() + " total days on screens. Check your time: https://screentime-mori.netlify.app/";
+            shareText = "I've spent " + Number(totalDays.toFixed(1)).toLocaleString() + " total days on screens. Check your time: https://screentime-mori.org/";
 
             screenDiv.style.opacity = '20';
 
@@ -824,9 +957,9 @@
         form.reset();
         hoursError.textContent = "";
         birthdateError.textContent = "";
+        dateError.textContent = "";
         ageSelectError.textContent = "";
         shareStatusMessage.textContent = "";
-        shareText = "";
     });
 </script>
 
