@@ -1,0 +1,465 @@
+        .title {
+            text-align: center;
+            font-family: "Roboto",system-ui;
+            color: #0F172A;
+        }
+        .center {
+            position: static;
+            transform: none;
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+        }
+        #subtitle {
+            transform: none;
+            margin-top: -4px;
+            margin-bottom: 24px;
+            color: #475569;
+            font-size: 14px;
+        }
+        #subtitle2 {
+            margin-top: -28px;
+            margin-bottom: 22px;
+        }
+        h1 {
+            font-size: 48px;
+            margin: 0;
+        }
+        h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+        h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #334155;
+        }
+        h4 {
+            margin: 0;
+            font-size: 15px;
+            color: #475569;
+        }
+        #mainTitle {
+            color: #F1F5F9;
+            margin-top: 28px;
+            margin-bottom: 26px;
+        }
+        .mainTitlePage {
+            color: #e8ebed;
+            text-align: center;
+        }
+        body {
+            font-family: "Roboto", system-ui, sans-serif;
+            background:
+                    radial-gradient(circle at center,
+                    rgba(0,0,0,0) 60%,
+                    rgba(0,0,0,0.35) 100%),
+                    radial-gradient(circle at 50% 20%,
+                    #2c314f 0%,
+                    #161b36 60%,
+                    #0c1022 100%);
+            margin: 0;
+            padding: 0 12px;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+
+            background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+            opacity: 0.04;
+
+            pointer-events: none;
+        }
+        #phoneDevice {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 380px;
+            height: 620px;
+            margin: auto;
+            border: 10px #0e0d0d solid;
+            border-top-width: 16px;
+            border-bottom-width: 34px;
+            border-radius: 20px;
+            background: #0e0d0d;
+            box-shadow:
+                    0 25px 60px rgba(0,0,0,0.55),
+                    0 8px 20px rgba(0,0,0,0.35),
+                    0 0 40px rgba(49, 46, 129, 0.08);
+        }
+        #phoneDevice::before { /* front camera notch */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 42%;
+            height: 15px;
+            background: #000;
+            border-radius: 0 0 20px 20px;
+            z-index: 2;
+        }
+        #homeBar { /* phone camera notch */
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+
+            width: 40%;
+            height: 5px;
+
+            background: #94A3B8;
+            border-radius: 5px;
+
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+        #homeBar:hover {
+            opacity: 1;
+        }
+        #homeBar:active {
+            transform: translateX(-50%) scaleX(0.95);
+        }
+        #phoneDevice #screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #F8FAFC, #EEF2F7);
+            overflow: hidden;
+            padding: 40px 20px;
+            box-sizing: border-box;
+            transition: opacity 0.3s ease;
+        }
+        #phoneDevice #results {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: linear-gradient(180deg, #F8FAFC, #EEF2F7);
+            display: none;
+            padding: 24px 20px;
+            box-sizing: border-box;
+            transition: opacity 0.3s ease;
+        }
+
+        #resultsScroller {
+            width: 100%;
+            height: 200%;
+            transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* ensure page 1 shows first */
+        #resultsPage1,
+        #resultsPage2 {
+            width: 100%;
+            height: 50%;
+            box-sizing: border-box;
+        }
+
+        .card {
+            margin-bottom: 18px;
+        }
+
+        #timeCalculator {
+            background: rgba(255,255,255,0.9);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #E2E8F0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #0F172A;
+            font-size: 14px;
+        }
+
+        input[type="number"],
+        input[type="date"],
+        input[type="text"] {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #CBD5E1;
+            font-size: 15px;
+            margin-bottom: 14px;
+        }
+
+        .button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 14px;
+            border: none;
+            border-radius: 12px;
+            background: #312E81;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        #back {
+            margin-top: 70px;
+        }
+        .button:active {
+            transform: translateY(2px);
+            box-shadow: 0 4px 10px;
+        }
+
+
+        /* RESULT PAGE 1 */
+        #resultsPage1 h1 {
+            text-align: center;
+            font-size: 60px;
+            color: #312E81;
+            line-height: 0.95;
+            letter-spacing: -1px;
+            white-space: nowrap;
+            overflow-wrap: normal;
+        }
+        #p1subtitle {
+            transform: translateY(-20px);
+        }
+        #resultsPage1 p {
+            text-align: center;
+            color: #334155;
+        }
+        #resultsPage1 h3,
+        #resultsPage1 h4 {
+            color: #334155;
+            text-align: center;
+            background: white;
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        /* RESULT PAGE 2 */
+        #resultsPage2 {
+            position: relative;
+            text-align: center;
+            padding-top: 24px;
+        }
+        #resultsPage2 .card {
+            margin-bottom: 10px;
+        }
+        #resultsPage2 h1 {
+            font-size: 52px;
+            color: #312E81;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+        #resultsPage2 h4 {
+            color: #475569;
+            font-size: 14px;
+        }
+        #resultsPage2 h2 {
+            font-size: 16px;
+            color: #475569;
+        }
+        #assumptionNote {
+            position: absolute;
+            bottom: 34px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 11px;
+            color: #94A3B8;
+            letter-spacing: 0.2px;
+        }
+        #homeHint {
+            position: absolute;
+            bottom: 18px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 11px;
+            color: #334155;
+            letter-spacing: 0.2px;
+            display: block;
+        }
+
+        /* SAVED TIME RESULTS */
+        #savedTimeTool {
+            margin-top: 18px;
+            padding: 12px 10px 10px 10px;
+            background: rgba(255,255,255,0.45);
+            border: 1px solid rgba(226,232,240,0.7);
+            border-radius: 14px;
+        }
+        #savedTimeLabel {
+            color: #334155;
+            margin-bottom: 12px;
+        }
+        #hoursSavedSlider {
+            width: 100%;
+            margin: 6px 0 10px 0;
+            accent-color: #312E81;
+        }
+        #sliderValue {
+            text-align: center;
+            color: #475569;
+            font-size: 14px;
+            margin: 0 0 12px 0;
+        }
+        #savedHoursResult {
+            text-align: center;
+            color: #334155;
+            font-size: 16px;
+            margin: 0 0 6px 0;
+        }
+        #savedYearsResult {
+            text-align: center;
+            color: #475569;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        /* Share Options */
+        .shareActions {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .shareButton {
+            flex: 1;
+            appearance: none;
+            -webkit-appearance: none;
+            padding: 11px 12px;
+            border: 1px solid rgba(49,46,129,0.16);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.55);
+            color: #312E81;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .shareButton:active {
+            transform: translateY(1px);
+            background: rgba(255,255,255,0.72);
+        }
+        .shareStatus {
+            min-height: 16px;
+            margin-top: 8px;
+            font-size: 12px;
+            text-align: center;
+            color: #475569;
+        }
+
+        /* Input Validation Error Styling */
+        .errorText {
+            color: #b91c1c;
+            font-size: 13px;
+            margin-top: 0;
+            padding-top: 0;
+            margin-bottom: 4px;
+            text-align: center;
+            min-height: 18px;
+            transform: translateY(-12px);
+        }
+        input:invalid {
+            border-color: #990000;
+            background-color: #ffdddd;
+        }
+        input:focus:invalid {
+            outline: none;
+        }
+
+        #desktopBirthdate {
+            display: block;
+        }
+        #mobileBirthdate {
+            display: none;
+        }
+        @media (max-width: 420px) {
+            #mobileBirthdate {
+                display: block;
+            }
+            #desktopBirthdate {
+                display: none;
+            }
+            h1 {
+                font-size: 38px;
+            }
+
+            #phoneDevice {
+                box-sizing: border-box;
+                height: 570px;
+            }
+
+            #phoneDevice #screen {
+                padding: 30px 16px;
+            }
+
+            #resultsPage1 {
+                padding-top: 4px;
+            }
+
+            #resultsPage1 .card {
+                margin-bottom: 10px;
+            }
+
+            #resultsPage1 h1 {
+                font-size: 48px;
+                margin-bottom: 4px;
+            }
+
+            #p1subtitle {
+                transform: translateY(-10px);
+                margin-bottom: 0;
+            }
+
+            #resultsPage1 h3,
+            #resultsPage1 h4 {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            #resultsPage1 .button {
+                margin-top: 8px;
+                padding: 12px;
+            }
+
+            .shareActions {
+                gap: 8px;
+                margin-top: 10px;
+            }
+
+            .shareButton {
+                padding: 10px 10px;
+                font-size: 13px;
+            }
+
+            #back {
+                margin-top: auto;
+            }
+
+            .shareStatus {
+                min-height: 14px;
+                margin-top: 6px;
+                font-size: 11px;
+            }
+
+            #resultsPage2 {
+                padding-top: 24px;
+            }
+        }
+        @media (max-height: 800px) {
+            body {
+                padding-top: 12px;
+                padding-bottom: 18px;
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+            #mainTitle {
+                margin-top: 12px;
+                margin-bottom: 14px;
+            }
+            #subtitle2 {
+                margin-top: -16px;
+                margin-bottom: 14px;
+            }
+            #resultsPage2 {
+                padding-bottom: 80px;
+            }
+        }
