@@ -15,6 +15,9 @@
     const wakingHoursPercentage = document.getElementById("timePercentage");
     const startingAge = document.getElementById("page2ScreenStartAge");
     const resultsScroller = document.getElementById("resultsScroller");
+    const resultsHeading = document.getElementById("resultsHeading");
+    const page2Heading = document.getElementById("page2Heading");
+    const calculatorHeading = document.getElementById("calculatorHeading");
     // error messages
     const hoursError = document.getElementById("avgHrsError");
     const birthdateError = document.getElementById("birthdateError");
@@ -41,6 +44,10 @@
     let savedRemainingYears;
     let shareText = "";
     let seenScreen2 = false;
+
+    // page 2 is never hidden, only translated off-screen, so keep it out of the
+    // tab order until it is actually showing
+    resultsPage2.inert = true;
 
     // UI cleanup incase browser doesn't support this function
     if (!navigator.share) {
@@ -127,10 +134,20 @@
         e.target.value = value;
     });
 
-    hoursInput.addEventListener("input", () => hoursError.textContent = "");
+    function setError(input, errorElement, message) {
+        errorElement.textContent = message;
+        input.setAttribute("aria-invalid", "true");
+        input.focus({ preventScroll: true });
+    }
+    function clearError(input, errorElement) {
+        errorElement.textContent = "";
+        input.removeAttribute("aria-invalid");
+    }
+
+    hoursInput.addEventListener("input", () => clearError(hoursInput, hoursError));
     ageInput.addEventListener("input", clearBirthdateErrors);
     dateInput.addEventListener("input", clearBirthdateErrors);
-    ageStartInput.addEventListener("input", () => ageSelectError.textContent = "");
+    ageStartInput.addEventListener("input", () => clearError(ageStartInput, ageSelectError));
 
     function getBirthdateValue() {
         const nativeDateValue = ageInput.value.trim();   // yyyy-mm-dd
@@ -209,8 +226,8 @@
     }
 
     function clearBirthdateErrors() {
-        birthdateError.textContent = "";
-        dateError.textContent = "";
+        clearError(ageInput, birthdateError);
+        clearError(dateInput, dateError);
     }
 
     function showBirthdateError(message) {
@@ -220,9 +237,15 @@
         clearBirthdateErrors();
 
         if (textHasValue && !nativeHasValue) {
-            dateError.textContent = message;
+            setError(dateInput, dateError, message);
+        } else if (nativeHasValue) {
+            setError(ageInput, birthdateError, message);
+        } else if (ageInput.offsetParent !== null) {
+            // neither field filled - target whichever one is actually visible,
+            // the other is display:none at this breakpoint so focus would no-op
+            setError(ageInput, birthdateError, message);
         } else {
-            birthdateError.textContent = message;
+            setError(dateInput, dateError, message);
         }
     }
 
@@ -232,9 +255,9 @@
 
     form.addEventListener("submit", function(event) {
         event.preventDefault();
-        hoursError.textContent = "";
+        clearError(hoursInput, hoursError);
         clearBirthdateErrors();
-        ageSelectError.textContent = "";
+        clearError(ageStartInput, ageSelectError);
 
         const birthdateResult = getBirthdateValue();
         const birthdateValue = birthdateResult.value;
@@ -246,11 +269,11 @@
 
         // user input validation
         if (hoursInput.value === "" || !hoursInput.value) {
-            hoursError.textContent = ("Hours per day cannot be blank.")
+            setError(hoursInput, hoursError, "Hours per day cannot be blank.");
             return;
         }
         if (ageStartInput.value === "" || !ageStartInput.value) {
-            ageSelectError.textContent = ("Please enter age you started screentime.");
+            setError(ageStartInput, ageSelectError, "Please enter age you started screentime.");
             return;
         }
 
@@ -261,21 +284,21 @@
 
         // final input validation
         if (isNaN(dailyHours) || dailyHours < 0) {
-            hoursError.textContent = ("Please enter a valid number.");
+            setError(hoursInput, hoursError, "Please enter a valid number.");
             return;
         }
         if (isNaN(ageStarted) || ageStarted < 0) {
-            ageSelectError.textContent = ("Please enter a valid number.");
+            setError(ageStartInput, ageSelectError, "Please enter a valid number.");
             return;
         }
 
         // extreme edge case catch
         if (dailyHours > 23.5) {
-            hoursError.textContent = ("You don't need anymore screen time💀, go to sleep.");
+            setError(hoursInput, hoursError, "You don't need anymore screen time💀, go to sleep.");
             return;
         }
         if (dailyHours > 20) {
-            hoursError.textContent = ("Please enter a valid number, or get some rest if this is really your screentime.");
+            setError(hoursInput, hoursError, "Please enter a valid number, or get some rest if this is really your screentime.");
             return;
         }
         // age calculation logic
@@ -295,7 +318,7 @@
         }
         // error prevention
         if (ageStarted > age) {
-            ageSelectError.textContent = ("Age started must be between 0 and your current age.");
+            setError(ageStartInput, ageSelectError, "Age started must be between 0 and your current age.");
             return;
         }
 
@@ -304,7 +327,7 @@
         screenStartDate.setFullYear(screenStartDate.getFullYear() + ageStarted);
         // extreme edge case catch
         if (screenStartDate > today) {
-            ageSelectError.textContent = ("Screen-time start date cannot be in the future. But while you're there, give me Monday's" +
+            setError(ageStartInput, ageSelectError, "Screen-time start date cannot be in the future. But while you're there, give me Monday's" +
                 " winning lottery numbers");
             return;
         }
@@ -346,6 +369,7 @@
             setTimeout(() => {
                 screenDiv.style.display = 'none';
                 resultsScreen.style.display = 'block';
+                resultsHeading.focus({ preventScroll: true });
                 resultsScreen.style.opacity = '1';
             }, 69);
             resultsScroller.style.transform = "translateY(0)";
@@ -369,20 +393,28 @@
         wakingHoursPercentage.textContent = (Number(screenPercentage.toFixed(0)) + "% of your waking life");
         startingAge.textContent = ("on screens since age " + Number(ageStarted));
 
+        resultsPage2.inert = false;
         resultsScroller.style.transform = "translateY(-50%)";
+        page2Heading.focus({ preventScroll: true });
+        resultsPage1.inert = true;
     })
 
     // back to page 1
     backButton.addEventListener("click", function(event) {
         event.preventDefault();
 
+        resultsPage1.inert = false;
         resultsScroller.style.transform = "translateY(0)";
+        resultsHeading.focus({ preventScroll: true });
+        resultsPage2.inert = true;
     })
 
     homeBar.addEventListener("click", function() {
         if (seenScreen2) { homeHint.style.display = "none"; }
         // reset scroll position
         resultsScroller.style.transform = "translateY(0)";
+        resultsPage1.inert = false;
+        resultsPage2.inert = true;
 
         // animate results downward + fade
         resultsScreen.style.transform = "translateY(40px)";
@@ -393,6 +425,7 @@
             resultsScreen.style.transform = "translateY(0)";
 
             screenDiv.style.display = "block";
+            calculatorHeading.focus({ preventScroll: true });
             screenDiv.style.opacity = "0";
 
             // fade input back in
@@ -404,9 +437,9 @@
 
         // reset form + errors
         form.reset();
-        hoursError.textContent = "";
-        birthdateError.textContent = "";
-        dateError.textContent = "";
-        ageSelectError.textContent = "";
+        clearError(hoursInput, hoursError);
+        clearError(ageInput, birthdateError);
+        clearError(dateInput, dateError);
+        clearError(ageStartInput, ageSelectError);
         shareStatusMessage.textContent = "";
     });

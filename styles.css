@@ -20,6 +20,8 @@
         #subtitle2 {
             margin-top: -28px;
             margin-bottom: 22px;
+            font-size: 18px;
+            font-weight: 700;
         }
         h1 {
             font-size: 48px;
@@ -114,6 +116,10 @@
             background: #94A3B8;
             border-radius: 5px;
 
+            border: none;
+            padding: 0;
+            appearance: none;
+
             cursor: pointer;
             opacity: 0.7;
             transition: opacity 0.2s ease;
@@ -123,6 +129,10 @@
         }
         #homeBar:active {
             transform: translateX(-50%) scaleX(0.95);
+        }
+        #homeBar:focus-visible {
+            outline: 2px solid #312E81;
+            outline-offset: 4px;
         }
         #phoneDevice #screen {
             width: 100%;
@@ -161,6 +171,19 @@
 
         .card {
             margin-bottom: 18px;
+        }
+
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            padding: 0;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+            clip-path: inset(50%);
+            white-space: nowrap;
+            border: 0;
         }
 
         #timeCalculator {
@@ -210,14 +233,16 @@
 
 
         /* RESULT PAGE 1 */
-        #resultsPage1 h1 {
+        #resultsPage1 .bigStat {
             text-align: center;
             font-size: 60px;
+            font-weight: 700;
             color: #312E81;
             line-height: 0.95;
             letter-spacing: -1px;
             white-space: nowrap;
             overflow-wrap: normal;
+            margin-top: 0;
         }
         #p1subtitle {
             transform: translateY(-20px);
@@ -226,14 +251,18 @@
             text-align: center;
             color: #334155;
         }
-        #resultsPage1 h3,
-        #resultsPage1 h4 {
+        #resultsPage1 .stat,
+        #resultsPage1 .statSmall {
             color: #334155;
+            font-weight: 700;
             text-align: center;
             background: white;
             border-radius: 12px;
             padding: 12px;
+            margin-top: 0;
         }
+        #resultsPage1 .stat { font-size: 18px; }
+        #resultsPage1 .statSmall { font-size: 15px; }
 
         /* RESULT PAGE 2 */
         #resultsPage2 {
@@ -244,19 +273,24 @@
         #resultsPage2 .card {
             margin-bottom: 10px;
         }
-        #resultsPage2 h1 {
+        #resultsPage2 .bigStat {
             font-size: 52px;
+            font-weight: 700;
             color: #312E81;
             line-height: 1;
-            margin-bottom: 8px;
+            margin-top: 0;
         }
-        #resultsPage2 h4 {
+        #resultsPage2 .leadIn {
             color: #475569;
             font-size: 14px;
+            font-weight: 700;
+            margin-top: 0;
         }
-        #resultsPage2 h2 {
+        #resultsPage2 .subStat {
             font-size: 16px;
+            font-weight: 700;
             color: #475569;
+            margin-top: 0;
         }
         #assumptionNote {
             position: absolute;
@@ -265,7 +299,7 @@
             width: 100%;
             text-align: center;
             font-size: 11px;
-            color: #94A3B8;
+            color: #475569;
             letter-spacing: 0.2px;
         }
         #homeHint {
@@ -289,7 +323,11 @@
             border-radius: 14px;
         }
         #savedTimeLabel {
-            color: #334155;
+            display: block;
+            color: #475569;
+            font-size: 14px;
+            font-weight: 700;
+            margin-top: 0;
             margin-bottom: 12px;
         }
         #hoursSavedSlider {
@@ -307,12 +345,14 @@
             text-align: center;
             color: #334155;
             font-size: 16px;
+            font-weight: 700;
             margin: 0 0 6px 0;
         }
         #savedYearsResult {
             text-align: center;
             color: #475569;
             font-size: 14px;
+            font-weight: 700;
             margin: 0;
         }
 
@@ -357,12 +397,10 @@
             min-height: 18px;
             transform: translateY(-12px);
         }
-        input:invalid {
+        input[aria-invalid="true"] {
             border-color: #990000;
+            box-shadow: inset 0 0 0 1px #990000;
             background-color: #ffdddd;
-        }
-        input:focus:invalid {
-            outline: none;
         }
 
         #desktopBirthdate {
@@ -399,9 +437,8 @@
                 margin-bottom: 10px;
             }
 
-            #resultsPage1 h1 {
+            #resultsPage1 .bigStat {
                 font-size: 48px;
-                margin-bottom: 4px;
             }
 
             #p1subtitle {
@@ -409,8 +446,8 @@
                 margin-bottom: 0;
             }
 
-            #resultsPage1 h3,
-            #resultsPage1 h4 {
+            #resultsPage1 .stat,
+            #resultsPage1 .statSmall {
                 padding: 10px;
                 font-size: 14px;
             }

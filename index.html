@@ -13,34 +13,34 @@
 
 <body>
 <h1 class="title" id="mainTitle">Memento Mori</h1>
-<h3 class="title mainTitlePage" id="subtitle2">A quiet reflection on time, routine, and what repetition becomes.</h3>
+<p class="title mainTitlePage" id="subtitle2">A quiet reflection on time, routine, and what repetition becomes.</p>
 
 <div id="phoneDevice">
 
     <div id="screen">
-        <h2 class="title">Screen Time Calculator</h2>
+        <h2 class="title" id="calculatorHeading" tabindex="-1">Screen Time Calculator</h2>
         <p class="title" id="subtitle">See where your time really goes</p>
 
         <form id="timeCalculator">
             <label for="hoursPerDay">Average hours of screentime per day:</label>
-            <input type="number" min="0" max="24" step="0.5" id="hoursPerDay">
-            <p id="avgHrsError" class="errorText"></p>
+            <input type="number" min="0" max="24" step="0.5" id="hoursPerDay" aria-describedby="avgHrsError">
+            <p id="avgHrsError" class="errorText" role="alert"></p>
 
             <div id="desktopBirthdate">
                 <label for="birthdate">Birthdate:</label>
-                <input type="date" id="birthdate">
-                <p id="birthdateError" class="errorText"></p>
+                <input type="date" id="birthdate" aria-describedby="birthdateError">
+                <p id="birthdateError" class="errorText" role="alert"></p>
             </div>
 
             <div id="mobileBirthdate">
                 <label for="dateField">Birthdate:</label>
-                <input type="text" inputmode="numeric" pattern="\d{2}/\d{2}/\d{4}" id="dateField" placeholder="MM/DD/YYYY" maxlength="10">
-                <p id="dateFieldError" class="errorText"></p>
+                <input type="text" inputmode="numeric" pattern="\d{2}/\d{2}/\d{4}" id="dateField" placeholder="MM/DD/YYYY" maxlength="10" aria-describedby="dateFieldError">
+                <p id="dateFieldError" class="errorText" role="alert"></p>
             </div>
 
             <label for="ageStarted">Approximate age you started screentime:</label>
-            <input type="number" min="0" step="1" id="ageStarted">
-            <p id="ageSelectError" class="errorText"></p>
+            <input type="number" min="0" step="1" id="ageStarted" aria-describedby="ageSelectError">
+            <p id="ageSelectError" class="errorText" role="alert"></p>
 
             <input type="submit" class="center button" value="Calculate">
         </form>
@@ -49,11 +49,12 @@
     <div id="results">
         <div id="resultsScroller">
             <div id="resultsPage1">
-                <h1 id="mainResult" class="card"></h1>
+                <h2 id="resultsHeading" class="visually-hidden" tabindex="-1">Your results</h2>
+                <p id="mainResult" class="card bigStat"></p>
                 <p class="card" id="p1subtitle">of your life on screens</p>
-                <h3 id="totalHours" class="card"></h3>
-                <h3 id="totalYears" class="card"></h3>
-                <h4 id="lifetimeProjection" class="card"></h4>
+                <p id="totalHours" class="card stat"></p>
+                <p id="totalYears" class="card stat"></p>
+                <p id="lifetimeProjection" class="card statSmall"></p>
                 <p class="card">This time is gone.</p>
 
                 <div class="shareActions">
@@ -69,16 +70,17 @@
             </div>
 
             <div id="resultsPage2">
-                <h4 class="card">You've spent about</h4>
-                <h1 id="timePercentage" class="card"></h1>
-                <h2 id="page2ScreenStartAge" class="card"></h2>
+                <h2 id="page2Heading" class="visually-hidden" tabindex="-1">Your time in perspective</h2>
+                <p class="card leadIn">You've spent about</p>
+                <p id="timePercentage" class="card bigStat"></p>
+                <p id="page2ScreenStartAge" class="card subStat"></p>
 
                 <div id="savedTimeTool">
-                    <h4 id="savedTimeLabel">Reduce by</h4>
-                    <input type="range" id="hoursSavedSlider" min="0" max="12" step="0.5" value="1">
+                    <label for="hoursSavedSlider" id="savedTimeLabel">Reduce by</label>
+                    <input type="range" id="hoursSavedSlider" min="0" max="12" step="0.5" value="1" aria-describedby="sliderValue">
                     <p id="sliderValue">1 hour per day</p>
-                    <h3 id="savedHoursResult"></h3>
-                    <h4 id="savedYearsResult"></h4>
+                    <p id="savedHoursResult"></p>
+                    <p id="savedYearsResult"></p>
                 </div>
 
                 <button id="back" class="button">Back</button>
@@ -89,7 +91,7 @@
         </div>
     </div>
 
-    <div id="homeBar"></div>
+    <button id="homeBar" type="button" aria-label="Return to calculator"></button>
 </div>
 
 <script src="script.js"></script>
